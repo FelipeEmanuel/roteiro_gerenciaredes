@@ -1,0 +1,38 @@
+---
+# tasks file for roteiro
+- name: Set a hostname
+  hostname:
+    name: "{{ hostname }}"
+
+- name: "Instalar lighttpd"
+  apt:
+    name: lighttpd
+    state: present
+
+- name: "Atualizar pacotes"
+  apt:
+    update_cache: yes
+    name:
+      - lighttpd
+      - vim
+      - curl
+      - python3
+    state: latest
+
+- name: "Iniciar e habilitar o serviço lighttpd"
+  service:
+    name: lighttpd
+    state: started
+    enabled: yes
+
+- name: "Copiar o arquivo HTML"
+  copy:
+    src: files/index.html
+    dest: /meu_diretorio_web/index.html
+  notify: restartLighttpd
+
+- name: "Copiar o arquivo de configuração lighttpd"
+  template:
+    src: templates/lighttpd.conf
+    dest: /etc/lighttpd/lighttpd.conf
+  notify: restartLighttpd
